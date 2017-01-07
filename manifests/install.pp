@@ -63,8 +63,14 @@ class sentry::install (
   # *after* Sentry to ensure the correct version of Sentry is installed
   validate_hash($extensions)
   $extensions.each |String $extension, String $url| {
+    # If url is the string 'false', use pip.
+    $source = $url ? {
+      'false'  => false,
+      default  => $url,
+    }
+
     python::pip { $extension:
-      url     => $url,
+      url     => $source,
       require => Python::Pip['sentry'],
     }
   }
